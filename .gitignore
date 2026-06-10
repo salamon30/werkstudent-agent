@@ -1,0 +1,21 @@
+# Personal data — never commit
+profile.md
+letters/
+applications.csv
+
+# Runtime state
+seen_jobs.json
+*.log
+
+# Credentials
+.env
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.python-version
+
+# macOS
+.DS_Store
