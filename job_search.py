@@ -45,20 +45,22 @@ HEADERS = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
                   "AppleWebKit/537.36 (KHTML, like Gecko) "
                   "Chrome/124.0.0.0 Safari/537.36",
-    "Accept-Language": "de-DE,de;q=0.9,en;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9,de-DE;q=0.8,de;q=0.7",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
 }
 
 ENGLISH_SIGNALS = re.compile(
     r"\b(machine learning|data science|computer vision|deep learning|"
-    r"embedded systems|working student|software engineer|data engineer|"
-    r"python|iot|automotive|adas|edge ai|neural network|artificial intelligence)\b",
+    r"embedded systems|working student|software engineer|software developer|"
+    r"data engineer|data analyst|python|iot|automotive|adas|edge ai|"
+    r"neural network|artificial intelligence|genai|robotics|intern|internship|english)\b",
     re.I,
 )
 
-# Başlıkta bu alanlar varsa ilan kesinlikle elenir (hukuk, finans, satış, HR vs.)
+# Başlıkta bu alanlar varsa ilan kesinlikle elenir (hukuk, finans, satış, HR, Senior/Lead/Manager vs.)
 EXCLUDED_FIELDS = re.compile(
-    r"\b(labour.?law|arbeitsrecht|arbeitnehmerrecht|jurist|jura\b|rechtswissen|"
+    r"\b(senior|sr\.|lead|principal|head.?of|director|manager|vp\b|chief|executive|staff.?engineer|"
+    r"labour.?law|arbeitsrecht|arbeitnehmerrecht|jurist|jura\b|rechtswissen|"
     r"compliance.{0,15}(jur|legal|recht)|steuerberater|buchhaltu|finanzbuchhaltu|"
     r"lohnbuchhaltu|controlling(?!.{0,20}(data|analytics|software))|"
     r"vertrieb(?!.{0,20}(data|digital|tech|software))|"
@@ -66,6 +68,13 @@ EXCLUDED_FIELDS = re.compile(
     r"personalwesen|human.?resources?\b|hr.?generalist|"
     r"einkauf(?!.{0,20}(data|software|tech))|"
     r"logistik(?!.{0,20}(software|data|it|tech)))\b",
+    re.I,
+)
+
+# Sadece Werkstudent, Working Student, Trainee veya Intern ilanları kabul edilir!
+STUDENT_OR_TRAINEE_SIGNAL = re.compile(
+    r"\b(werkstudent|working.?student|trainee|intern|internship|praktik|praktikant|graduate|junior|"
+    r"new.?grad|entry.?level|early.?career|berufseinsteiger\w*|absolvent\w*)\b",
     re.I,
 )
 
@@ -84,65 +93,81 @@ TECHNICAL_SIGNAL = re.compile(
     re.I,
 )
 
-# StepStone: şehir isimleri (yeni URL formatı: ?q=...&where=...)
-STEPSTONE_CITIES = ["München", "Nürnberg", "Erlangen", "Regensburg", "Forchheim"]
+# StepStone: şehir isimleri
+STEPSTONE_CITIES = ["München", "Nürnberg", "Erlangen", "Regensburg", "Ingolstadt", "Forchheim"]
 
 STEPSTONE_KEYWORDS = [
-    "werkstudent machine learning",
-    "werkstudent data science",
-    "werkstudent embedded python",
-    "werkstudent software developer",
-    "werkstudent automotive",
-    "werkstudent artificial intelligence",
-    "werkstudent IoT",
+    "working student machine learning",
+    "working student data science",
+    "working student ai",
+    "working student software developer",
+    "working student data analytics",
+    "working student computer vision",
+    "working student python",
+    "working student embedded",
+    "working student data engineer",
+    "working student robotics",
+    "working student genai",
+    "working student english",
+    # Yeni mezun / junior
+    "junior data scientist",
+    "junior machine learning engineer",
+    "junior data analyst",
+    "graduate ai engineer",
+    "entry level software engineer",
 ]
 
-# Arbeitnow API: (anahtar kelime, şehir) çiftleri — ücretsiz, bot koruması yok
+# Arbeitnow API: (anahtar kelime, şehir) çiftleri
 ARBEITNOW_PAIRS = [
-    ("werkstudent machine learning",        "München"),
-    ("werkstudent machine learning",        "Nürnberg"),
-    ("werkstudent machine learning",        "Erlangen"),
-    ("werkstudent data science",            "München"),
-    ("werkstudent data science",            "Erlangen"),
-    ("werkstudent embedded python",         "München"),
-    ("werkstudent embedded python",         "Erlangen"),
-    ("werkstudent embedded python",         "Regensburg"),
-    ("werkstudent software developer",      "München"),
-    ("werkstudent software developer",      "Nürnberg"),
-    ("werkstudent automotive",              "München"),
-    ("werkstudent automotive",              "Nürnberg"),
-    ("werkstudent artificial intelligence", "München"),
-    ("werkstudent IoT",                     "München"),
-    ("werkstudent IoT",                     "Erlangen"),
-    ("werkstudent python",                  "Erlangen"),
-    ("werkstudent data",                    "Erlangen"),
+    ("working student machine learning",    "München"),
+    ("working student data science",        "München"),
+    ("working student data science",        "Erlangen"),
+    ("working student ai",                  "München"),
+    ("working student ai",                  "Nürnberg"),
+    ("working student software",            "München"),
+    ("working student data analytics",      "München"),
+    ("working student python",              "Erlangen"),
+    ("working student computer vision",     "München"),
+    ("working student robotics",            "München"),
+    ("working student data engineer",       "München"),
+    ("working student embedded",            "Erlangen"),
 ]
 
 # Xing: (anahtar kelime, şehir) çiftleri
 XING_PAIRS = [
-    ("Werkstudent machine learning",        "München"),
-    ("Werkstudent machine learning",        "Nürnberg"),
-    ("Werkstudent machine learning",        "Erlangen"),
-    ("Werkstudent data science",            "München"),
-    ("Werkstudent data science",            "Erlangen"),
-    ("Werkstudent embedded python",         "München"),
-    ("Werkstudent software developer",      "München"),
-    ("Werkstudent software developer",      "Nürnberg"),
-    ("Werkstudent automotive",              "München"),
-    ("Werkstudent automotive",              "Nürnberg"),
-    ("Werkstudent artificial intelligence", "München"),
-    ("Werkstudent IoT",                     "Erlangen"),
+    ("Working student machine learning",    "München"),
+    ("Working student data science",        "München"),
+    ("Working student data science",        "Erlangen"),
+    ("Working student ai",                  "München"),
+    ("Working student software",            "München"),
+    ("Working student data analytics",      "München"),
+    ("Working student embedded python",     "München"),
+    ("Working student software developer",  "München"),
+    ("Working student software developer",  "Nürnberg"),
+    ("Working student robotics",            "München"),
+    # Yeni mezun / junior
+    ("Junior data scientist",               "München"),
+    ("Junior machine learning engineer",    "München"),
+    ("Junior data analyst",                 "München"),
+    ("Junior data scientist",               "Nürnberg"),
+    ("Graduate AI engineer",                "München"),
+    ("Junior software engineer english",    "München"),
 ]
 
 
-def fetch(url: str, timeout: int = 10) -> BeautifulSoup | None:
-    try:
-        r = requests.get(url, headers=HEADERS, timeout=timeout)
-        print(f"  HTTP {r.status_code}  {url[:80]}", flush=True)
-        if r.status_code == 200:
-            return BeautifulSoup(r.text, "html.parser")
-    except Exception as e:
-        print(f"  FETCH ERROR: {e}  {url[:80]}", flush=True)
+def fetch(url: str, timeout: int = 10, retries: int = 2) -> BeautifulSoup | None:
+    for attempt in range(retries):
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=timeout)
+            print(f"  HTTP {r.status_code}  {url[:80]}", flush=True)
+            if r.status_code == 200:
+                # Bayttan çözümle: charset başlığı eksikse "für" → "fÃ¼r" bozulması olmasın
+                return BeautifulSoup(r.content, "html.parser")
+        except Exception as e:
+            if attempt == retries - 1:
+                print(f"  FETCH ERROR: {e}  {url[:80]}", flush=True)
+            else:
+                time.sleep(2)
     return None
 
 
@@ -299,7 +324,7 @@ def scrape_xing() -> list[dict]:
             if r.status_code != 200:
                 time.sleep(1)
                 continue
-            soup = BeautifulSoup(r.text, "html.parser")
+            soup = BeautifulSoup(r.content, "html.parser")
         except Exception as e:
             print(f"  Xing ERROR: {e}", flush=True)
             time.sleep(1)
@@ -356,86 +381,151 @@ def scrape_xing() -> list[dict]:
 
 
 def is_relevant(job: dict) -> bool:
-    """Kara liste veya teknik sinyal eksikliği varsa False döner."""
+    """Kara liste, kıdemli (Senior/Lead) pozisyonlar veya öğrenci/trainee olmayan ilanları eler."""
     title = job.get("title", "")
     if EXCLUDED_FIELDS.search(title):
+        return False
+    if not STUDENT_OR_TRAINEE_SIGNAL.search(title):
         return False
     if not TECHNICAL_SIGNAL.search(title):
         return False
     return True
 
 
-def search_jobs() -> list[dict]:
-    all_jobs = scrape_stepstone() + scrape_arbeitnow() + scrape_xing()
+SECTION_LIMIT = 25      # bir bölümde mail başına en fazla ilan (kalanı ertesi güne kalır)
+GERMAN_LIMIT = 5        # Almanca ilanlardan mail başına en fazla kaç tane
 
-    # URL'ye göre deduplicate
-    seen_urls: set[str] = set()
-    unique: list[dict] = []
-    for j in all_jobs:
-        if j["url"] not in seen_urls:
-            seen_urls.add(j["url"])
-            unique.append(j)
-
-    # Alakasız alanları ele
-    relevant = [j for j in unique if is_relevant(j)]
-
-    # İngilizce önce, Almanca sonra
-    english = [j for j in relevant if j["lang"] == "EN"]
-    german  = [j for j in relevant if j["lang"] == "DE"]
-    return (english + german)[:25]
+SECTIONS = [
+    ("en",     "🇩🇪 Almanya – İngilizce ilanlar",            "Bavyera bölgesindeki İngilizce başlıklı Working Student / staj ilanları."),
+    ("remote", "🌍 Remote – dünya geneli (part-time / staj)", "Almanya'dan yapılabilecek uzaktan part-time ve staj ilanları."),
+    ("grad",   "🎓 Yeni mezun / junior (Almanya + remote)",  "İngilizce başlıklı giriş seviyesi tam zamanlı ilanlar. Mezuniyet tarihine göre değerlendir."),
+    ("swiss",  "🇨🇭 İsviçre",                                 "İsviçre'de durumuna az da olsa uyan her ilan. Dil sütununa dikkat et."),
+    ("de",     "🇩🇪 Almanca ilanlar – yalnızca alanına çok uygun olanlar", "Başlığı Almanca ama doğrudan AI / ML / veri alanında olan ilanlar."),
+]
 
 
-def build_html(jobs: list[dict], date_str: str) -> str:
-    if not jobs:
-        rows = "<tr><td colspan='5' style='text-align:center;padding:20px;color:#666'>Bugün uygun ilan bulunamadı.</td></tr>"
-    else:
+def _dedupe(jobs: list[dict]) -> list[dict]:
+    """Aynı URL'yi ve aynı başlık+şirket çiftini tekrar etme."""
+    seen_keys: set = set()
+    out = []
+    for j in jobs:
+        keys = {j["url"], (j["title"].lower(), j.get("company", "").lower())}
+        if keys & seen_keys:
+            continue
+        seen_keys |= keys
+        out.append(j)
+    return out
+
+
+def search_jobs() -> dict[str, list[dict]]:
+    """Tüm kaynakları tarar ve ilanları mail bölümlerine ayırır."""
+    from extra_sources import GRAD_NOTE, detect_lang, is_core_field, is_grad_title, remote_jobs, swiss_jobs
+
+    # 1) Almanya (Bavyera) — StepStone, Arbeitnow, Xing
+    local = [j for j in _dedupe(scrape_stepstone() + scrape_arbeitnow() + scrape_xing()) if is_relevant(j)]
+    for j in local:
+        j["lang"] = detect_lang(j["title"])
+        j.setdefault("source", "")
+        j.setdefault("note", GRAD_NOTE if is_grad_title(j["title"]) else "")
+
+    # 2) Remote — dünya geneli
+    remote = _dedupe(remote_jobs())
+
+    # 3) İsviçre
+    swiss = _dedupe(swiss_jobs())
+
+    is_grad = lambda j: j.get("note") == GRAD_NOTE
+    english = [j for j in local if j["lang"] == "EN" and not is_grad(j)]
+    grad = [j for j in local + remote if j["lang"] == "EN" and is_grad(j)]
+    # Almanca başlıklı ilanlar: yalnızca çekirdek alandaysa (AI/ML/veri)
+    german = [j for j in local + remote if j["lang"] == "DE" and is_core_field(j["title"])]
+    remote = [j for j in remote if j["lang"] != "DE" and not is_grad(j)]
+    # İsviçre: önce İngilizce, sonra Almanca/Fransızca; çekirdek alan üstte
+    swiss.sort(key=lambda j: (j["lang"] != "EN", not is_core_field(j["title"])))
+    for group in (english, remote, grad, german):
+        group.sort(key=lambda j: not is_core_field(j["title"]))
+
+    return {"en": english, "remote": remote, "grad": _dedupe(grad), "swiss": swiss, "de": _dedupe(german)}
+
+
+def _esc(text: str) -> str:
+    return str(text or "").replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+LANG_STYLE = {
+    "EN": ("#e6f4ea", "#137333"),
+    "DE": ("#feefc3", "#b06000"),
+    "FR": ("#fde7e9", "#b3261e"),
+}
+
+
+def build_html(sections: dict[str, list[dict]], date_str: str, leftover: int = 0) -> str:
+    total = sum(len(v) for v in sections.values())
+    blocks = ""
+    for key, heading, hint in SECTIONS:
+        jobs = sections.get(key, [])
+        if not jobs:
+            if key == "swiss":
+                blocks += f"<h3 style='margin:28px 0 6px 0'>{heading}</h3><p style='color:#777;font-size:13px'>Bugün İsviçre'de yeni ilan yok.</p>"
+            continue
         rows = ""
         for i, j in enumerate(jobs, 1):
-            title   = j["title"].replace("<", "&lt;").replace(">", "&gt;")
-            company = j.get("company", "").replace("<", "&lt;").replace(">", "&gt;")
-            city    = j.get("city", "").replace("<", "&lt;").replace(">", "&gt;")
+            bg, fg = LANG_STYLE.get(j.get("lang", "EN"), LANG_STYLE["EN"])
+            detail = " · ".join(_esc(x) for x in (j.get("note"), j.get("source")) if x)
             rows += f"""
             <tr style="background:{'#f9f9f9' if i % 2 == 0 else 'white'}">
-              <td style="text-align:center;font-weight:bold">{i}</td>
-              <td><b>{title}</b><br><span style="color:#555;font-size:13px">{company}</span></td>
-              <td style="text-align:center;color:#555">{city}</td>
-              <td style="text-align:center"><span style="background:#e8f0fe;color:#1a73e8;padding:2px 8px;border-radius:3px;font-size:12px">{j['lang']}</span></td>
-              <td style="text-align:center"><a href="{j['url']}" style="background:#1a73e8;color:white;padding:5px 12px;border-radius:4px;text-decoration:none">🔗 Başvur</a></td>
+              <td style="text-align:center;color:#888">{i}</td>
+              <td><b>{_esc(j['title'])}</b><br><span style="color:#555;font-size:13px">{_esc(j.get('company'))}</span>
+                  {f'<br><span style="color:#777;font-size:12px">{detail}</span>' if detail else ''}</td>
+              <td style="text-align:center;color:#555;font-size:13px">{_esc(j.get('city'))}</td>
+              <td style="text-align:center"><span style="background:{bg};color:{fg};padding:2px 8px;border-radius:3px;font-size:12px;font-weight:bold">{_esc(j.get('lang'))}</span></td>
+              <td style="text-align:center"><a href="{_esc(j['url'])}" style="background:#1a73e8;color:white;padding:5px 12px;border-radius:4px;text-decoration:none">İlana git</a></td>
             </tr>"""
-
-    count = len(jobs)
-    return f"""
-<html><body style="font-family:Arial,sans-serif;max-width:900px;margin:auto;padding:20px">
-  <h2 style="color:#1a73e8">🎯 Werkstudent İlanları — {date_str}</h2>
-  <p>Arama bölgesi: <b>München · Nürnberg · Regensburg · Erlangen</b></p>
-  <table border="1" cellpadding="10" cellspacing="0"
-         style="border-collapse:collapse;width:100%;border-color:#e0e0e0">
-    <thead>
-      <tr style="background:#1a73e8;color:white">
-        <th width="4%">#</th>
-        <th>Pozisyon</th>
-        <th width="12%">Şehir</th>
-        <th width="6%">Dil</th>
-        <th width="10%">Link</th>
-      </tr>
-    </thead>
+        blocks += f"""
+  <h3 style="margin:28px 0 4px 0">{heading} <span style="color:#888;font-weight:normal">({len(jobs)})</span></h3>
+  <p style="color:#777;font-size:13px;margin:0 0 8px 0">{hint}</p>
+  <table border="1" cellpadding="9" cellspacing="0" style="border-collapse:collapse;width:100%;border-color:#e0e0e0">
+    <thead><tr style="background:#f1f3f4;color:#333">
+      <th width="4%">#</th><th>Pozisyon</th><th width="18%">Yer</th><th width="6%">Dil</th><th width="11%">Link</th>
+    </tr></thead>
     <tbody>{rows}</tbody>
-  </table>
-  <p style="margin-top:16px"><b>Toplam {count} ilan bulundu.</b></p>
-  <p style="color:#999;font-size:11px">Bu özet otomatik olarak oluşturulmuştur — {date_str}</p>
+  </table>"""
+
+    summary = " · ".join(f"{heading.split(' – ')[0].split(' (')[0]}: <b>{len(sections.get(key, []))}</b>"
+                         for key, heading, _ in SECTIONS)
+    more = (f"<br><span style='color:#777;font-size:12px'>{leftover} ilan daha sırada; yarınki mailde gelecek.</span>"
+            if leftover else "")
+
+    return f"""
+<html><body style="font-family:Arial,sans-serif;max-width:950px;margin:auto;padding:20px;color:#333">
+  <div style="background:#1a73e8;color:white;padding:20px;border-radius:8px;margin-bottom:20px">
+    <h2 style="margin:0">🎯 İlan Raporu — {date_str}</h2>
+    <p style="margin:5px 0 0 0;opacity:0.9">Almanya (İngilizce) · Remote · Yeni mezun · İsviçre</p>
+  </div>
+
+  <div style="background:#f8f9fa;border-left:4px solid #1a73e8;padding:12px 16px;margin-bottom:8px;border-radius:0 4px 4px 0">
+    <b>Bugün {total} yeni ilan.</b> {summary}{more}
+  </div>
+  {blocks}
+
+  <p style="color:#999;font-size:11px;margin-top:24px">Dil sütunu ilan başlığına (jobs.ch ve SwissDevJobs'ta ilanın dil alanına) göre tahmindir; başvurmadan önce ilanı kontrol et.<br>
+  Kaynaklar: StepStone, Xing, Arbeitnow, Remotive, Remote OK, Jobicy, Himalayas, Working Nomads, We Work Remotely, jobs.ch, SwissDevJobs.</p>
 </body></html>"""
 
 
-def wait_for_network(max_wait: int = 1800) -> bool:
-    """Ağ bağlantısı hazır olana kadar bekler (max_wait saniye)."""
-    deadline = time.time() + max_wait
-    while time.time() < deadline:
+def wait_for_network(max_retries: int = 60, delay: int = 10) -> bool:
+    """Ağ bağlantısı ve DNS tam hazır olana kadar bekler."""
+    import socket
+    for attempt in range(max_retries):
         try:
-            requests.head("https://www.google.com", timeout=5)
-            return True
+            socket.gethostbyname("www.stepstone.de")
+            r = requests.head("https://www.google.com", timeout=5)
+            if r.status_code in [200, 301, 302, 304]:
+                return True
         except Exception:
-            print(f"[{datetime.now().isoformat()}] Ağ bekleniyor...", flush=True)
-            time.sleep(20)
+            pass
+        print(f"[{datetime.now().isoformat()}] Ağ ve DNS bekleniyor... ({attempt+1}/{max_retries})", flush=True)
+        time.sleep(delay)
     return False
 
 
@@ -460,8 +550,12 @@ def send_email(html_body: str, subject: str, retries: int = 4) -> None:
 
 
 def main():
+    # DRY_RUN=1: mail atmaz, görülenler listesini değiştirmez, HTML'i dosyaya yazar.
+    dry_run = os.environ.get("DRY_RUN") == "1"
+
     print(f"[{datetime.now().isoformat()}] Başlıyor...", flush=True)
-    time.sleep(60)  # Mac uyanışından sonra DNS'in hazır olması için bekle
+    if not dry_run:
+        time.sleep(60)  # Mac uyanışından sonra DNS'in hazır olması için bekle
 
     if not wait_for_network():
         print(f"[{datetime.now().isoformat()}] HATA: Ağ bağlantısı kurulamadı, çıkılıyor.", flush=True)
@@ -471,29 +565,48 @@ def main():
     date_str = datetime.now().strftime("%-d %B %Y")
 
     seen = load_seen()
-    all_jobs = search_jobs()
+    found = search_jobs()
 
-    # Daha önce gönderilmemiş olanları filtrele
-    new_jobs = [j for j in all_jobs if j["url"] not in seen]
+    # Daha önce gönderilmemiş olanları al; bölüm sınırını aşanlar ertesi güne kalır
+    # (görüldü olarak işaretlenmez).
+    sections: dict[str, list[dict]] = {}
+    leftover = 0
+    for key, jobs in found.items():
+        fresh = [j for j in jobs if j["url"] not in seen]
+        limit = GERMAN_LIMIT if key == "de" else SECTION_LIMIT
+        sections[key] = fresh[:limit]
+        leftover += max(0, len(fresh) - limit)
 
-    # Yeni ilanları seen'e ekle
-    now = datetime.now().isoformat()
-    for j in new_jobs:
-        seen[j["url"]] = now
-    save_seen(seen)
-
-    count = len(new_jobs)
-    print(f"[{datetime.now().isoformat()}] {count} yeni ilan (toplam {len(all_jobs)} bulundu)", flush=True)
+    count = sum(len(v) for v in sections.values())
+    per_section = ", ".join(f"{k}={len(v)}" for k, v in sections.items())
+    print(f"[{datetime.now().isoformat()}] {count} yeni ilan ({per_section}; sırada {leftover})", flush=True)
 
     if count == 0:
         print(f"[{datetime.now().isoformat()}] Yeni ilan yok, email atlanıyor.", flush=True)
         return
 
-    subject = f"🎯 Werkstudent İlanları – {date_str} | {count} yeni ilan"
-    html_body = build_html(new_jobs, date_str)
+    subject = (f"🎯 İlanlar – {date_str} | {len(sections['en'])} Almanya (EN) · "
+               f"{len(sections['remote'])} remote · {len(sections['grad'])} yeni mezun · {len(sections['swiss'])} İsviçre")
+    html_body = build_html(sections, date_str, leftover)
+
+    if dry_run:
+        out = os.environ.get("DRY_RUN_OUT", "job_search_preview.html")
+        with open(out, "w", encoding="utf-8") as f:
+            f.write(html_body)
+        print(f"[DRY RUN] Mail atılmadı. Konu: {subject}\n[DRY RUN] Önizleme: {out}", flush=True)
+        return
+
     send_email(html_body, subject)
+
+    # Yalnızca gerçekten gönderilen ilanları görüldü olarak işaretle
+    now = datetime.now().isoformat()
+    for jobs in sections.values():
+        for j in jobs:
+            seen[j["url"]] = now
+    save_seen(seen)
     print(f"[{datetime.now().isoformat()}] Gönderildi: {count} yeni ilan — {EMAIL_TO}")
 
 
 if __name__ == "__main__":
     main()
+
