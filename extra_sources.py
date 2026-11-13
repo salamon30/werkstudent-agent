@@ -105,6 +105,14 @@ def is_core_field(title: str) -> bool:
     return bool(CORE_FIELD.search(title))
 
 
+# Yeni mezun bölümü için: yalnızca veri / AI / Python başlıkları
+DATA_AI_PYTHON = re.compile(r"\bpython\b|\bdata\b|\bdaten\b|analytics|\bml\b|business.?intelligence|\bbi\b", re.I)
+
+
+def is_data_ai_python(title: str) -> bool:
+    return is_core_field(title) or bool(DATA_AI_PYTHON.search(title))
+
+
 def _get(url: str, name: str, timeout: int = 20):
     try:
         r = requests.get(url, headers=HEADERS, timeout=timeout)

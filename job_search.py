@@ -398,7 +398,7 @@ GERMAN_LIMIT = 5        # Almanca ilanlardan mail başına en fazla kaç tane
 SECTIONS = [
     ("en",     "🇩🇪 Almanya – İngilizce ilanlar",            "Bavyera bölgesindeki İngilizce başlıklı Working Student / staj ilanları."),
     ("remote", "🌍 Remote – dünya geneli (part-time / staj)", "Almanya'dan yapılabilecek uzaktan part-time ve staj ilanları."),
-    ("grad",   "🎓 Yeni mezun / junior (Almanya + remote)",  "İngilizce başlıklı giriş seviyesi tam zamanlı ilanlar. Mezuniyet tarihine göre değerlendir."),
+    ("grad",   "🎓 Yeni mezun / junior (Almanya + remote)",  "İngilizce başlıklı, veri / AI / Python alanındaki giriş seviyesi ilanlar. Mezuniyet tarihine göre değerlendir."),
     ("swiss",  "🇨🇭 İsviçre",                                 "İsviçre'de durumuna az da olsa uyan her ilan. Dil sütununa dikkat et."),
     ("de",     "🇩🇪 Almanca ilanlar – yalnızca alanına çok uygun olanlar", "Başlığı Almanca ama doğrudan AI / ML / veri alanında olan ilanlar."),
 ]
@@ -419,7 +419,8 @@ def _dedupe(jobs: list[dict]) -> list[dict]:
 
 def search_jobs() -> dict[str, list[dict]]:
     """Tüm kaynakları tarar ve ilanları mail bölümlerine ayırır."""
-    from extra_sources import GRAD_NOTE, detect_lang, is_core_field, is_grad_title, remote_jobs, swiss_jobs
+    from extra_sources import (GRAD_NOTE, detect_lang, is_core_field, is_data_ai_python,
+                               is_grad_title, remote_jobs, swiss_jobs)
 
     # 1) Almanya (Bavyera) — StepStone, Arbeitnow, Xing
     local = [j for j in _dedupe(scrape_stepstone() + scrape_arbeitnow() + scrape_xing()) if is_relevant(j)]
@@ -436,7 +437,9 @@ def search_jobs() -> dict[str, list[dict]]:
 
     is_grad = lambda j: j.get("note") == GRAD_NOTE
     english = [j for j in local if j["lang"] == "EN" and not is_grad(j)]
-    grad = [j for j in local + remote if j["lang"] == "EN" and is_grad(j)]
+    # Yeni mezun bölümü yalnızca veri / AI / Python başlıklarını gösterir
+    grad = [j for j in local + remote
+            if j["lang"] == "EN" and is_grad(j) and is_data_ai_python(j["title"])]
     # Almanca başlıklı ilanlar: yalnızca çekirdek alandaysa (AI/ML/veri)
     german = [j for j in local + remote if j["lang"] == "DE" and is_core_field(j["title"])]
     remote = [j for j in remote if j["lang"] != "DE" and not is_grad(j)]
